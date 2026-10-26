@@ -1,3 +1,11 @@
+/*
+ * CONTEXTO INICIAL
+ * Modela un equipo registrado en la tabla agentes. codigo identifica el equipo para
+ * buscarlo y actualizar sus datos sin crear otro registro en cada envío de métricas.
+ * Los campos persistentes contienen hostname, sistema y estado de CPU/memoria.
+ * uiEventsPayload y processSnapshotJson son transitorios: transportan datos del protocolo
+ * Python hacia el servicio, pero no crean columnas ni representan la auditoría web.
+ */
 package org.example.entity;
 
 import jakarta.persistence.*;

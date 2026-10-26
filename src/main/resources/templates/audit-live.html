@@ -1,0 +1,21 @@
+<!doctype html>
+<!--
+CONTEXTO INICIAL
+Vista general de administración disponible en /auditoria y /admin/auditoria-viva.
+Reutiliza el fragmento del dashboard sin filtro de agente para mostrar el historial
+general, incluidas capturas antiguas sin asignación. audit-dashboard.js combina
+el historial de PostgreSQL con las notificaciones SSE y reconstruye cada contexto.
+La autorización ADMIN se aplica en Spring Security.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Auditoría en vivo · ElLich</title>
+    <link rel="stylesheet" th:href="@{/css/audit-live.css}">
+    <script type="module" th:src="@{/js/audit-dashboard.js}"></script>
+</head>
+<body class="audit-page"><main class="audit-shell">
+    <header class="audit-header"><div><h1>Auditoría en vivo</h1><p>ElLich · actividad de todos los agentes y capturas sin asignar</p></div>
+        <a th:href="@{/agentes}" target="_blank" rel="noopener">Abrir agentes en otra pestaña</a></header>
+    <section th:replace="~{fragments/audit-dashboard :: feed(null)}"></section>
+</main></body></html>

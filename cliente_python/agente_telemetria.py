@@ -1,3 +1,10 @@
+# CONTEXTO INICIAL
+# Cliente legado de telemetría de equipos, independiente del capturador web.
+# Reúne métricas del sistema y utiliza un buffer para las interacciones que capturan
+# sus listeners; periódicamente envía un formulario al endpoint de máquinas con
+# autenticación Basic. El backend actualiza agentes y guarda esas interacciones
+# en endpoint_events. Este canal no utiliza los contextos ni el filtro de contraseñas
+# del DOM del módulo web, cuyos registros se almacenan en audit_events.
 import platform
 import hashlib
 import requests
@@ -132,7 +139,10 @@ class LichTelemetryBuffer:
 class LichAgent:
     def __init__(self, server_url="http://localhost:8080"):
         self.server_url = server_url
-        self.endpoint_save = f"{server_url}/agentes/guardar"
+        self.endpoint_save = f"{server_url}/api/agentes/telemetria"
+        self.api_password = os.environ.get("AUDIT_AGENT_PASSWORD", "")
+        if not self.api_password:
+            raise ValueError("Configura AUDIT_AGENT_PASSWORD (la misma del backend)")
 
         # Identidad determinista del endpoint
         hostname = platform.node()
@@ -225,6 +235,7 @@ class LichAgent:
             response = requests.post(
                 self.endpoint_save,
                 data=payload,
+                auth=("agent", self.api_password),
                 timeout=10,
                 headers={"Content-Type": "application/x-www-form-urlencoded"}
             )

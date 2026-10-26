@@ -1,3 +1,11 @@
+/*
+ * CONTEXTO INICIAL
+ * Representa un evento del protocolo legado del agente Python en endpoint_events.
+ * Cada fila pertenece a un Agente y almacena timestamp, tipo de entrada, valor,
+ * modificadores y ventana activa declarados por ese cliente. La relación se carga
+ * bajo demanda. Esta tabla es independiente de audit_events, que contiene el nuevo
+ * flujo web con contextos, validación de lotes y reconstrucción de sesión.
+ */
 package org.example.entity;
 
 import jakarta.persistence.*;

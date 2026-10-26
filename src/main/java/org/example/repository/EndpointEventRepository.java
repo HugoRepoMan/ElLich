@@ -1,3 +1,10 @@
+/*
+ * CONTEXTO INICIAL
+ * Contiene las consultas del historial legado de endpoint_events.
+ * La lectura une cada evento con su agente y utiliza paginación para limitar el volumen
+ * cargado en la pantalla. También declara una operación de depuración por antigüedad;
+ * no hay una limpieza automática programada aquí. La auditoría web utiliza otro repositorio.
+ */
 package org.example.repository;
 
 import org.example.entity.EndpointEvent;

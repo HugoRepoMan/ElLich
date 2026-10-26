@@ -1,108 +1,39 @@
-<!DOCTYPE html>
+<!doctype html>
+<!--
+CONTEXTO INICIAL
+Pantalla Ver Actividad de un agente concreto: /agentes/{codigo}/auditoria.
+Recibe del controlador sus metadatos y el historial legado. Los fragmentos incorporan
+la captura web, el área de prueba, la reconstrucción y el feed filtrado por ese agente.
+audit-spy.js envía las interacciones y audit-dashboard.js escucha los eventos confirmados.
+La sección Python permanece separada para distinguir ambas fuentes de información.
+-->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auditoría de Endpoint - El Lich</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .event-value {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            background-color: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid #dee2e6;
-        }
-        .modifier-badge {
-            font-size: 0.75rem;
-        }
-        .window-context {
-            font-style: italic;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-    </style>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf.token}"><meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title th:text="${'Auditoría · ' + agente.codigo + ' · ElLich'}">Auditoría · ElLich</title>
+    <link rel="stylesheet" th:href="@{/css/audit-live.css}">
+    <script defer th:src="@{/js/audit-spy.js}"></script>
+    <script type="module" th:src="@{/js/audit-dashboard.js}"></script>
 </head>
-<body class="bg-light">
-<div class="container my-4">
-
-    <!-- Encabezado con Metadatos del Agente -->
-    <div class="card mb-4">
-        <div class="card-header bg-dark text-white">
-            <h4 class="mb-0">
-                <a href="/agentes" class="text-white text-decoration-none">← Volver a Agentes</a>
-                | Auditoría de Endpoint
-            </h4>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <strong>Hostname:</strong>
-                    <span th:text="${agente.hostname}">unknown</span>
-                </div>
-                <div class="col-md-4">
-                    <strong>Sistema Operativo:</strong>
-                    <span th:text="${agente.system}">unknown</span>
-                </div>
-                <div class="col-md-4">
-                    <strong>Última CPU:</strong>
-                    <span th:text="${agente.cpuPercent} + '%'">0%</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tabla de Eventos de Interacción -->
-    <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">Eventos Recientes (Máx. 50)</h5>
-        </div>
-        <div class="card-body">
-            <div th:if="${#lists.isEmpty(eventos)}" class="alert alert-info">
-                No se han capturado eventos de interacción para este endpoint aún.
-                Asegúrate de que el agente Python esté ejecutándose y de que interactúes con el teclado.
-            </div>
-
-            <div class="table-responsive" th:unless="${#lists.isEmpty(eventos)}">
-                <table class="table table-striped table-hover table-sm align-middle">
-                    <thead class="table-dark">
-                    <tr>
-                        <th scope="col" width="150">Timestamp (ms)</th>
-                        <th scope="col" width="100">Tipo</th>
-                        <th scope="col" width="150">Valor</th>
-                        <th scope="col" width="150">Modificadores</th>
-                        <th scope="col">Ventana Activa</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="evento : ${eventos}">
-                        <td class="text-muted" th:text="${evento.occurredAtMs}">0</td>
-                        <td>
-                            <span th:if="${evento.inputType == 'KEYBOARD'}" class="badge bg-primary">KEY</span>
-                            <span th:if="${evento.inputType == 'MOUSE'}" class="badge bg-success">MOUSE</span>
-                            <span th:unless="${evento.inputType == 'KEYBOARD' or evento.inputType == 'MOUSE'}" class="badge bg-secondary" th:text="${evento.inputType}">UNKNOWN</span>
-                        </td>
-                        <td>
-                            <span class="event-value" th:text="${evento.value}">tecla</span>
-                        </td>
-                        <td>
-                            <span th:if="${#strings.isEmpty(evento.modifiers)}" class="text-muted">-</span>
-                            <span th:each="mod : ${#strings.arraySplit(evento.modifiers, '+')}"
-                                  th:if="${not #strings.isEmpty(evento.modifiers)}"
-                                  class="badge bg-warning text-dark modifier-badge me-1"
-                                  th:text="${mod}">MOD</span>
-                        </td>
-                        <td class="window-context" th:text="${evento.activeWindow}">unknown</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<body class="audit-page"><main class="audit-shell">
+    <header class="audit-header">
+        <div><h1>Auditoría del agente <span th:text="${agente.codigo}"></span></h1>
+            <p><strong th:text="${agente.hostname}"></strong> · <span th:text="${agente.system ?: 'Sistema no informado'}"></span></p></div>
+        <a th:href="@{/agentes}">Volver a agentes</a>
+    </header>
+    <section th:replace="~{fragments/audit-capture :: panel('agent-audit', ${agente.codigo})}"></section>
+    <section th:replace="~{fragments/audit-capture :: demo}"></section>
+    <section th:replace="~{fragments/audit-dashboard :: feed(${agente.codigo})}"></section>
+    <details class="audit-card" style="margin-top:24px">
+        <summary>Historial del agente Python (canal independiente)</summary>
+        <p th:if="${#lists.isEmpty(eventos)}">No hay registros del agente Python. La captura web de arriba funciona independientemente de ese canal.</p>
+        <table th:unless="${#lists.isEmpty(eventos)}">
+            <thead><tr><th>Timestamp</th><th>Tipo</th><th>Valor</th><th>Modificadores</th><th>Ventana</th></tr></thead>
+            <tbody><tr th:each="event : ${eventos}">
+                <td th:text="${event.occurredAtMs}"></td><td th:text="${event.inputType}"></td>
+                <td th:text="${event.value}"></td><td th:text="${event.modifiers}"></td><td th:text="${event.activeWindow}"></td>
+            </tr></tbody>
+        </table>
+    </details>
+</main></body></html>

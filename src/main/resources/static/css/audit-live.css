@@ -1,0 +1,36 @@
+/*
+ * CONTEXTO INICIAL
+ * Presentación compartida por las pantallas y fragmentos de auditoría.
+ * Define la disposición del feed y la reconstrucción, los paneles de captura y los estados.
+ * Los colores distinguen teclado, clics, eventos de interfaz y acciones confirmadas
+ * por el servidor. La regla responsive apila las columnas en pantallas pequeñas.
+ * Los estilos no participan en la captura, los permisos ni la persistencia.
+ */
+/* Colores distintos para teclado, clics y acciones confirmadas. */
+:root { color-scheme: light; --ink:#172738; --line:#d9e2ec; }
+body.audit-page { margin:0; background:#f3f6fa; color:var(--ink); font:16px/1.5 system-ui,sans-serif; }
+.audit-shell { max-width:1400px; margin:0 auto; padding:28px; }
+.audit-header { display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; }
+.audit-header h1 { margin-bottom:0; }
+.audit-header a { color:#174b8d; }
+.audit-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; }
+.audit-card { background:white; border:1px solid var(--line); border-radius:12px; padding:22px; min-width:0; }
+.audit-status { padding:6px 12px; border-radius:20px; background:#d7f5e7; color:#125139; }
+.audit-notice { background:#fff3cd; padding:12px; border-radius:8px; }
+.audit-feed { list-style:none; padding:0; max-height:70vh; overflow:auto; }
+.audit-event { display:grid; gap:5px; border-left:4px solid; padding:10px 14px; margin:10px 0; overflow-wrap:anywhere; }
+.audit-key { border-color:#4f46e5; background:#eef2ff; }
+.audit-click { border-color:#059669; background:#ecfdf5; }
+.audit-ui { border-color:#d97706; background:#fffbeb; }
+.audit-server { border-color:#0e7490; background:#cffafe; }
+.audit-event small { color:#4b5563; }
+.audit-event code { white-space:pre-wrap; }
+.replay-field { padding:12px 0; border-top:1px solid var(--line); }
+.replay-field h3 { font-size:15px; margin:0 0 8px; }
+.replay-field pre { min-height:36px; margin:0; padding:12px; background:#f3f6fa; white-space:pre-wrap; overflow-wrap:anywhere; }
+.audit-panel { padding:16px; border:1px solid #93c5fd; border-radius:8px; background:#eff6ff; margin-bottom:20px; }
+[data-audit-id]:focus { outline:3px solid #818cf8; outline-offset:2px; }
+.audit-demo { padding:16px; margin-top:16px; border:1px solid #d9e2ec; }
+.audit-demo label { display:block; margin:10px 0; }
+.audit-demo textarea { width:100%; }
+@media(max-width:850px) { .audit-grid { grid-template-columns:1fr; } .audit-shell { padding:16px; } }

@@ -1,8 +1,18 @@
+/*
+ * CONTEXTO INICIAL
+ * Gestiona los equipos registrados y el protocolo de telemetría Python.
+ * Busca el equipo por código, inserta o actualiza sus métricas y convierte el payload
+ * legado de interacciones en filas EndpointEvent. Ofrece consultas para las vistas.
+ * guardarDesdeWeb añade la acción confirmada del guardado en la misma transacción.
+ * Las teclas y eventos del nuevo capturador web pasan por AuditService, no por este parser.
+ */
 package org.example.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.entity.Agente;
+import org.example.audit.AuditPersistence;
+import java.util.UUID;
 import org.example.entity.EndpointEvent;
 import org.example.repository.AgenteRepository;
 import org.example.repository.EndpointEventRepository;
@@ -25,6 +35,16 @@ public class AgenteService {
 
     @Autowired
     private EndpointEventRepository endpointEventRepository;
+
+    @Autowired
+    private AuditPersistence auditPersistence;
+
+    /** Cambio de negocio y auditoría confirmada se guardan en la misma transacción. */
+    @Transactional
+    public void guardarDesdeWeb(Agente agente, String actor, UUID sessionReference) {
+        procesarTelemetria(agente);
+        auditPersistence.confirmedSave(actor, sessionReference, agente.getCodigo());
+    }
 
     // ObjectMapper para deserializar los payloads JSON enviados por el agente Python
     private final ObjectMapper objectMapper = new ObjectMapper();

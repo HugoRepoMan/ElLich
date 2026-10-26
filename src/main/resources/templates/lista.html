@@ -1,8 +1,20 @@
 <!DOCTYPE html>
+<!--
+CONTEXTO INICIAL
+Vista principal renderizada por AgenteController con la lista de agentes.
+Incluye el formulario de registro, la selección del agente al que se asignará una
+captura web y los enlaces Ver Actividad. Thymeleaf aporta datos y tokens CSRF.
+audit-spy.js captura sólo después de activar el panel y actualiza la tabla al guardar
+sin desmontar el buffer de eventos de la página.
+-->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <link rel="stylesheet" th:href="@{/css/audit-live.css}">
+    <script defer th:src="@{/js/audit-spy.js}"></script>
     <title>El Lich - Auditoría de Endpoints</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -13,47 +25,56 @@
         <a href="/" class="btn btn-primary">Inicio</a>
     </div>
 
+    <section th:replace="~{fragments/audit-capture :: panel('agents', null)}"></section>
     <!-- Formulario para pruebas manuales (Opcional) -->
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">Registro Manual de Agente</h5>
         </div>
         <div class="card-body">
-            <form method="post" th:action="@{/agentes/guardar}" class="row g-3">
+            <form method="post" th:action="@{/agentes/guardar}" data-audit-form class="row g-3">
                 <div class="col-md-3">
                     <label class="form-label">Código</label>
-                    <input type="text" class="form-control" name="codigo" required>
+                    <input type="text" class="form-control" name="codigo" data-audit-id="codigo" required>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Hostname</label>
-                    <input type="text" class="form-control" name="hostname" required>
+                    <input type="text" class="form-control" name="hostname" data-audit-id="hostname" required>
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Sistema</label>
-                    <input type="text" class="form-control" name="system" placeholder="Windows/Linux">
+                    <input type="text" class="form-control" name="system" data-audit-id="system" placeholder="Windows/Linux">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">CPU %</label>
-                    <input type="number" step="0.01" class="form-control" name="cpuPercent">
+                    <input type="number" step="0.01" class="form-control" name="cpuPercent" data-audit-id="cpuPercent">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">RAM (MB)</label>
-                    <input type="number" step="0.01" class="form-control" name="consumoMemoriaMb">
+                    <input type="number" step="0.01" class="form-control" name="consumoMemoriaMb" data-audit-id="consumoMemoriaMb">
                 </div>
                 <div class="col-12 d-flex justify-content-end">
-                    <button type="submit" class="btn btn-success">Guardar/Actualizar</button>
+                    <button type="submit" data-audit-id="save-agent" class="btn btn-success">Guardar/Actualizar</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <fieldset class="audit-demo mb-4">
+        <legend>Prueba de reconstrucción y privacidad</legend>
+        <label>Notas de prueba <textarea data-audit-id="demo-notes" maxlength="512" rows="3" placeholder="Texto de prueba sin datos sensibles"></textarea></label>
+        <label>Selección <select data-audit-id="demo-choice"><option value="one">Uno</option><option value="two">Dos</option></select></label>
+        <label><input type="radio" name="demo-radio" value="a" data-audit-id="demo-radio-a"> Opción A</label>
+        <label><input type="radio" name="demo-radio" value="b" data-audit-id="demo-radio-b"> Opción B</label>
+        <label>Contraseña de prueba (contenido excluido) <input type="password" autocomplete="new-password" data-audit-id="demo-secret"></label>
+    </fieldset>
     <!-- Tabla de Agentes -->
     <div class="card">
         <div class="card-header">
             <h5 class="mb-0">Agentes Registrados</h5>
         </div>
         <div class="card-body">
-            <div class="table-responsive">
+            <div class="table-responsive" data-agent-table>
                 <table class="table table-striped table-hover align-middle">
                     <thead class="table-dark">
                     <tr>

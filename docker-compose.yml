@@ -1,3 +1,8 @@
+# CONTEXTO INICIAL
+# Define un PostgreSQL 16 para desarrollo local. Las variables DB_NAME, DB_USER,
+# DB_PASSWORD y DB_PORT ajustan la base y su publicación al equipo anfitrión.
+# El volumen nombrado conserva los datos entre reinicios del contenedor.
+# Este archivo prepara la base; la aplicación Spring Boot se inicia por separado.
 services:
   postgres-auditoria:
     image: postgres:16-alpine

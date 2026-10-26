@@ -1,5 +1,7 @@
 # Sistema de Auditoría de Endpoints — Fase 1 (Arquitectura Monolítica Síncrona)
 
+> El proyecto incluye ahora **Auditoría web en vivo**, con autenticación obligatoria. Consulta [la guía actualizada de ejecución, seguridad y código](docs/LIVE_AUDIT.md) antes de seguir los pasos históricos de Fase 1.
+
 Este documento describe en detalle la arquitectura, decisiones de diseño y componentes implementados en la **Fase 1** del Sistema de Auditoría de Endpoints. El objetivo de esta fase es demostrar el funcionamiento de un **monolito tradicional síncrono/bloqueante** en **Spring Boot (MVC + Thymeleaf + JPA)** interactuando con un **Agente de Telemetría en Python** mediante peticiones `application/x-www-form-urlencoded` (sin hacer uso de `@RestController` ni JSON).
 
 ---

@@ -1,0 +1,29 @@
+<!doctype html>
+<!--
+CONTEXTO INICIAL
+Estructura HTML compartida del feed, el selector de capturas y la reconstrucción.
+feed recibe un código de agente opcional y lo expone como atributo para que
+audit-dashboard.js solicite el historial y el SSE correspondientes.
+Los identificadores del DOM son puntos de actualización del script; Thymeleaf
+construye la estructura y JavaScript agrega los eventos usando texto seguro.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="feed(agentCode)" data-audit-dashboard th:data-audit-agent="${agentCode}" th:data-audit-api="@{/api/audit}">
+    <p><span id="audit-connection" class="audit-status" role="status">Conectando…</span></p>
+    <p>Los eventos del navegador son declaraciones del cliente; las acciones de negocio confirmadas se identifican por separado.</p>
+    <p id="audit-warning" class="audit-notice" role="status" hidden></p>
+    <div class="audit-grid">
+        <section class="audit-card">
+            <h2>Reconstrucción de sesión</h2>
+            <label for="audit-context">Captura</label> <select id="audit-context"></select>
+            <div id="audit-reconstruction"></div>
+        </section>
+        <section class="audit-card">
+            <h2>Eventos en vivo</h2>
+            <p>Violeta: teclado · verde: clic · ámbar: interfaz · cian: servidor.</p>
+            <p id="audit-empty">Todavía no hay eventos web para esta vista. Activa la captura y escribe en los campos de prueba, o selecciona este agente al capturar desde la página de agentes.</p>
+            <ol id="audit-feed" class="audit-feed" aria-label="Eventos de auditoría"></ol>
+        </section>
+    </div>
+</section>
+</body></html>

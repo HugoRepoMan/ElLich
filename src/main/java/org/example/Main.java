@@ -1,3 +1,10 @@
+/*
+ * CONTEXTO INICIAL
+ * Punto de entrada del monolito Spring Boot. Al ejecutar main, Spring crea el servidor
+ * HTTP, conecta JPA con PostgreSQL y descubre los componentes dentro de org.example.
+ * Los controladores atienden peticiones, los servicios aplican las reglas y los repositorios
+ * acceden a las tablas. Las vistas HTML se construyen con Thymeleaf.
+ */
 package org.example;
 
 import org.springframework.boot.SpringApplication;

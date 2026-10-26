@@ -1,0 +1,36 @@
+<!doctype html>
+<!--
+CONTEXTO INICIAL
+Fragmentos reutilizables de Thymeleaf para activar la captura y probar interacciones.
+panel recibe la página y un código de agente: si no hay código, permite seleccionarlo;
+si viene de Ver Actividad, el agente queda fijado por esa pantalla.
+demo contiene los campos de prueba. Los atributos data-audit-id los vinculan con
+AuditPolicy; tener el atributo en HTML por sí solo no concede permiso de captura.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="panel(page, agentCode)" class="audit-panel" data-audit-panel
+         th:data-audit-page="${page}" th:data-audit-agent="${agentCode}" th:data-audit-api="@{/api/audit}">
+    <h3>Captura web</h3>
+    <p>Al activar se registran teclas, valores, clics, selecciones y foco de los campos señalados de esta página. Las contraseñas están excluidas. Usa datos de prueba.</p>
+    <label th:if="${agentCode == null}">Asignar captura al agente:
+        <select data-audit-agent-select>
+            <option value="" disabled selected>Selecciona un agente</option>
+            <option th:each="item : ${agentes}" th:value="${item.codigo}" th:text="${item.codigo + ' · ' + item.hostname}"></option>
+        </select>
+    </label>
+    <p th:if="${agentCode != null}">Esta captura aparecerá en la auditoría de <strong th:text="${agentCode}"></strong>.</p>
+    <button type="button" class="btn btn-primary" data-audit-start>Activar captura</button>
+    <button type="button" class="btn btn-outline-danger" data-audit-stop disabled>Detener y enviar</button>
+    <a th:href="@{/auditoria}" class="btn btn-outline-dark" target="_blank" rel="noopener">Auditoría general</a>
+    <p data-audit-status role="status">Captura desactivada.</p>
+</section>
+<section th:fragment="demo" class="audit-demo mb-4">
+    <h3>Prueba de interacción</h3>
+    <label>Escribe aquí para ver la reconstrucción:
+        <textarea data-audit-id="demo-notes" maxlength="512" rows="3" placeholder="Texto de prueba sin datos sensibles"></textarea>
+    </label>
+    <label>Selección <select data-audit-id="demo-choice"><option value="one">Uno</option><option value="two">Dos</option></select></label>
+    <button type="button" data-audit-id="demo-click" class="btn btn-outline-primary">Probar clic</button>
+    <label>Contraseña de prueba (contenido excluido) <input type="password" autocomplete="new-password" data-audit-id="demo-secret"></label>
+</section>
+</body></html>

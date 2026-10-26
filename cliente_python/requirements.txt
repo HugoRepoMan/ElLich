@@ -1,2 +1,6 @@
+# CONTEXTO INICIAL
+# Dependencias del cliente Python legado. pip utiliza esta lista para instalar las
+# librerías necesarias para recolectar métricas, capturar las entradas de ese cliente
+# y enviar sus peticiones HTTP. No corresponde a las dependencias del backend Java.
 psutil>=5.9.8
 requests>=2.31.0
