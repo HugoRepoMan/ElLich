@@ -6,7 +6,7 @@ REM Los argumentos se pasan al lanzador; un puerto opcional sustituye al 8080.
 REM Si falla, mantiene visible la consola para poder leer el error.
 setlocal
 cd /d "%~dp0"
-java scriptsIniciarElLich.java %*
+java scripts\IniciarElLich.java %*
 if errorlevel 1 (
   echo.
   echo ElLich no pudo iniciar. Revisa el error mostrado arriba.

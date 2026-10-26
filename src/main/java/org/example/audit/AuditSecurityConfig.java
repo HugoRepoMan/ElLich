@@ -9,6 +9,7 @@
 package org.example.audit;
 
 import jakarta.servlet.DispatcherType;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.Order;
@@ -19,6 +20,11 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.*;
+import java.security.SecureRandom;
+import java.util.Base64;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -30,7 +36,8 @@ public class AuditSecurityConfig {
             @Value("${app.audit.admin-password:}") String password,
             @Value("${app.audit.operator-password:}") String operatorPassword,
             @Value("${app.audit.agent-password:}") String agentPassword) {
-        if (password.isBlank() || password.length() < 12)
+        if (password.isBlank()) password = localAdminPassword();
+        if (password.length() < 12)
             throw new IllegalStateException("Configurar AUDIT_ADMIN_PASSWORD con al menos 12 caracteres");
         var users = new InMemoryUserDetailsManager();
         users.createUser(User.withUsername(admin).password(encoder.encode(password)).roles("ADMIN", "USER").build());
@@ -43,6 +50,25 @@ public class AuditSecurityConfig {
             users.createUser(User.withUsername("agent").password(encoder.encode(agentPassword)).roles("AGENT").build());
         }
         return users;
+    }
+    /**
+     * Sin AUDIT_ADMIN_PASSWORD (por ejemplo, al ejecutar Main desde IntelliJ) usa la misma
+     * clave local que genera iniciar-ellich.cmd en target, creándola si aún no existe.
+     */
+    static String localAdminPassword() {
+        Path keyFile = Path.of("target", ".local-admin-password");
+        try {
+            if (!Files.exists(keyFile)) {
+                Files.createDirectories(keyFile.getParent());
+                byte[] bytes = new byte[24]; new SecureRandom().nextBytes(bytes);
+                Files.writeString(keyFile, Base64.getUrlEncoder().withoutPadding().encodeToString(bytes), StandardOpenOption.CREATE_NEW);
+            }
+            LoggerFactory.getLogger(AuditSecurityConfig.class)
+                    .warn("AUDIT_ADMIN_PASSWORD no configurada; clave de administrador local en {}", keyFile.toAbsolutePath());
+            return Files.readString(keyFile).trim();
+        } catch (IOException e) {
+            throw new UncheckedIOException("No se pudo preparar la clave local de administrador", e);
+        }
     }
     /** API de máquinas: Basic sin cookies ni sesión. Usar HTTPS fuera de localhost. */
     @Bean @Order(1) SecurityFilterChain machine(HttpSecurity http) throws Exception {
